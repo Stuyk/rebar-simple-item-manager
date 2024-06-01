@@ -1,4 +1,5 @@
 import * as alt from 'alt-server';
+import * as Utility from '@Shared/utility/index.js';
 import { useRebar } from '@Server/index.js';
 
 import { useItemArrayManager } from './itemArrayManager.js';
@@ -55,7 +56,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return
      */
     async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
-        const currentItems = await get();
+        const currentItems = await getInternal();
         const items = itemArrayManager.add(id, quantity, currentItems, addOptions);
         if (!items) {
             return false;
@@ -79,7 +80,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return {Promise<boolean>}
      */
     async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
-        const currentItems = await get();
+        const currentItems = await getInternal();
         const initialQuantity = quantity;
         const items = itemArrayManager.remove(id, quantity, currentItems);
         if (!items) {
@@ -99,13 +100,50 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * @return {Item[]}
      */
-    async function get(): Promise<Item[]> {
+    async function get(): Promise<Readonly<Item[]>> {
         const document = await db.get<Storage>({ id: identifier }, ItemManagerConfig.collectionNameForStorage);
         if (!document) {
             return [];
         }
 
-        return document.items ?? [];
+        return (Utility.clone.arrayData(document.items) as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
+    }
+
+    /**
+     * Gets an item based on uid, returns `undefined` if not found
+     *
+     * @param {string} uid
+     * @returns {Readonly<Item> | undefined}
+     */
+    async function getByUid(uid: string) {
+        const items = await get();
+        return itemArrayManager.getByUid(uid, items);
+    }
+
+    /**
+     * Gets internal item data and allows conversion of data with generics
+     *
+     * @template T
+     * @param {string} uid
+     * @return {Promise<(Readonly<T> | undefined)>}
+     */
+    async function getData<T = Object>(uid: string): Promise<Readonly<T> | undefined> {
+        const items = await getInternal();
+        return itemArrayManager.getData(uid, items);
+    }
+
+    /**
+     * Internal get items that doesn't mark it as readonly
+     *
+     * @return {Promise<Item[]>}
+     */
+    async function getInternal(): Promise<Item[]> {
+        const document = await db.get<Storage>({ id: identifier }, ItemManagerConfig.collectionNameForStorage);
+        if (!document) {
+            return [];
+        }
+
+        return Utility.clone.arrayData(document.items) ?? [];
     }
 
     /**
@@ -118,7 +156,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return
      */
     async function has(id: ItemIDs, quantity: number) {
-        const currentItems = await get();
+        const currentItems = await getInternal();
         return itemArrayManager.has(id, quantity, currentItems);
     }
 
@@ -132,7 +170,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return
      */
     async function stack(uidToStackOn: string, uidToStack: string) {
-        const currentItems = await get();
+        const currentItems = await getInternal();
         const items = itemArrayManager.stack(uidToStackOn, uidToStack, currentItems);
         if (!items) {
             return false;
@@ -156,7 +194,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return
      */
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
-        const currentItems = await get();
+        const currentItems = await getInternal();
         const items = itemArrayManager.split(uid, amountToSplit, currentItems, options);
         if (!items) {
             return false;
@@ -181,9 +219,32 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         );
     }
 
+    /**
+     * Updates the data set for a single item, overwriting any data inside.
+     *
+     * @param {string} uid
+     * @param {Partial<Omit<Item, '_id'>>} data
+     * @returns {boolean}
+     */
+    async function update(uid: string, data: Partial<Omit<Item, '_id'>>) {
+        const currentItems = await getInternal();
+        const items = itemArrayManager.update(uid, data, currentItems);
+        if (!items) {
+            return false;
+        }
+
+        await updateItems(items);
+
+        invoker.invokeOnItemsUpdated(identifier, items);
+
+        return true;
+    }
+
     return {
         add,
         get,
+        getByUid,
+        getData,
         getErrorMessage() {
             return itemArrayManager.getErrorMessage();
         },
@@ -191,5 +252,6 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         remove,
         split,
         stack,
+        update,
     };
 }

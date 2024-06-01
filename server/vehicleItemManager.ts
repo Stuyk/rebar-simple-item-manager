@@ -71,10 +71,34 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
     /**
      * Get all items the player currently has available
      *
-     * @return {Item[]}
+     * @return {Readonly<Item[]>}
      */
-    function get(): Item[] {
-        return document.get<InventoryExtension>().items ?? [];
+    function get(): Readonly<Item[]> {
+        return (document.get<InventoryExtension>().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
+    }
+
+    /**
+     * Gets an item based on uid, returns `undefined` if not found
+     *
+     * @param {string} uid
+     * @returns {Readonly<Item> | undefined}
+     */
+    function getAt(uid: string) {
+        const items = get();
+        const item = items.find((x) => x.uid === uid);
+        return item ? (item as Readonly<Item>) : undefined;
+    }
+
+    /**
+     * Gets internal item data and allows conversion of data with generics
+     *
+     * @template T
+     * @param {string} uid
+     * @return {(Readonly<T> | undefined)}
+     */
+    function getData<T = Object>(uid: string): Readonly<T> | undefined {
+        const items = get();
+        return itemArrayManager.getData(uid, items);
     }
 
     /**
@@ -150,9 +174,36 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
         return true;
     }
 
+    /**
+     * Updates the data set for a single item, overwriting any data inside.
+     *
+     * @param {string} uid
+     * @param {Partial<Omit<Item, '_id'>>} data
+     * @returns {boolean}
+     */
+    async function update(uid: string, data: Partial<Omit<Item, '_id'>>) {
+        const vehicleDocument = document.get<InventoryExtension>();
+        if (!vehicleDocument.items) {
+            return false;
+        }
+
+        const items = itemArrayManager.update(uid, data, vehicleDocument.items);
+        if (!items) {
+            return false;
+        }
+
+        await document.set<InventoryExtension>('items', items);
+
+        invoker.invokeOnItemsUpdated(vehicle, items);
+
+        return true;
+    }
+
     return {
         add,
         get,
+        getAt,
+        getData,
         getErrorMessage() {
             return itemArrayManager.getErrorMessage();
         },
@@ -160,5 +211,6 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
         remove,
         split,
         stack,
+        update,
     };
 }

@@ -85,6 +85,36 @@ export type BaseItem = {
      * @type {string}
      */
     icon: string;
+
+    /**
+     * The number of in-game hours before this item expires. If this value is never set it never expires.
+     *
+     * If the decay is set to zero at any point, any decayed items will be removed.
+     *
+     * @type {number}
+     */
+    decay?: number;
+
+    /**
+     * Optional ruleset to further describe how the item will work
+     *
+     * Item manager does not manage these rules, just a placeholder to help with rules
+     */
+    rules?: {
+        /**
+         * Prevent the item from being traded, stored
+         *
+         * @type {boolean}
+         */
+        noTradingOrStorage?: boolean;
+
+        /**
+         * Destroy the item on drop
+         *
+         * @type {boolean}
+         */
+        noDropping?: boolean;
+    };
 };
 
 export type Item = {
@@ -130,9 +160,9 @@ export type AddOptions = {
      *
      * Custom data cannot be added to items with a stack greater than 1
      *
-     * @type {{[key: string]: any}}
+     * @type {{[key: string]: string | number | Array<any>}}
      */
-    data?: { [key: string]: any };
+    data?: { [key: string]: string | number | Array<any> };
 };
 
 export type DatabaseBaseItem = {

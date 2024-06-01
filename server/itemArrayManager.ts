@@ -166,6 +166,40 @@ export function useItemArrayManager() {
     }
 
     /**
+     * Gets an item based on uid, returns `undefined` if not found
+     *
+     * @param {string} uid
+     * @returns {Item | undefined}
+     */
+    function getByUid(uid: string, items: Readonly<Item[]>) {
+        errorMessage = '';
+
+        const item = items.find((x) => x.uid === uid);
+        if (!item) {
+            errorMessage = `Unable to get item by uid, item does not exist`;
+        }
+
+        return item ? (item as Readonly<Item>) : undefined;
+    }
+
+    /**
+     * Gets any custom data that is attached to an item
+     *
+     * @template T
+     * @param {string} uid
+     * @return {(Readonly<T> | undefined)}
+     */
+    function getData<T = Object>(uid: string, items: Readonly<Item[]>): Readonly<T> | undefined {
+        const item = getByUid(uid, items);
+        if (!item) {
+            // Error already defined
+            return undefined;
+        }
+
+        return item.data as Readonly<T>;
+    }
+
+    /**
      * Remove items until all of them are removed.
      *
      * Returns `undefined` if unable to remove enough items.
@@ -234,6 +268,38 @@ export function useItemArrayManager() {
 
         const item = items.splice(index, 1);
         return { items, item };
+    }
+
+    /**
+     * Remove a quantity of an item based on `uid`
+     *
+     * @param {string} uid
+     * @param {number} quantity
+     * @param {Item[]} items
+     * @return
+     */
+    function removeQuantityFrom(uid: string, quantity: number, items: Item[]) {
+        errorMessage = '';
+
+        items = Utility.clone.arrayData(items);
+        const index = items.findIndex((x) => x.uid === uid);
+        if (index <= -1) {
+            errorMessage = 'Could not find item to remove';
+            return undefined;
+        }
+
+        if (items[index].quantity < quantity) {
+            errorMessage = 'Quantity provided does not match available item quantity';
+            return undefined;
+        }
+
+        if (items[index].quantity === quantity) {
+            items.splice(index, 1);
+            return items;
+        }
+
+        items[index].quantity -= quantity;
+        return items;
     }
 
     /**
@@ -352,13 +418,55 @@ export function useItemArrayManager() {
         return items;
     }
 
+    /**
+     * Modifies item object data and overwrites any values provided
+     *
+     * @param {string} uid
+     * @param {Partial<Omit<Item, '_id'>>} data
+     * @param {Item[]} items
+     * @return
+     */
+    function update(uid: string, data: Partial<Omit<Item, '_id'>>, items: Item[]) {
+        errorMessage = '';
+        items = Utility.clone.arrayData(items);
+
+        const index = items.findIndex((x) => x.uid === uid);
+        if (index <= -1) {
+            errorMessage = `Unable to get item by uid, item does not exist`;
+            return undefined;
+        }
+
+        // Handle decay when set to zero
+        if (typeof data.decay !== 'undefined' && data.decay === 0) {
+            items.slice(index, 1);
+            return items;
+        }
+
+        items[index] = Object.assign(items[index], data);
+        return items;
+    }
+
+    /**
+     * Override the error message
+     *
+     * @param {string} message
+     */
+    function setErrorMessage(message: string) {
+        errorMessage = message;
+    }
+
     return {
         add,
+        getByUid,
+        getData,
         getErrorMessage,
         has,
         remove,
         removeAt,
+        removeQuantityFrom,
+        setErrorMessage,
         split,
         stack,
+        update,
     };
 }
