@@ -35,6 +35,13 @@ export type Storage = {
      * @type {number}
      */
     lastAccessed: number;
+
+    /**
+     * Does this storage ignore decaying
+     *
+     * @type {boolean}
+     */
+    noDecay?: boolean;
 } & InventoryExtension;
 
 export type BaseItem = {

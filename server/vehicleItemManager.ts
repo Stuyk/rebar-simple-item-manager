@@ -69,6 +69,30 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
     }
 
     /**
+     * Remove a quantity of items from a specific item stack based on `uid`
+     *
+     * @param {string} uid
+     * @param {number} quantity
+     * @returns {boolean}
+     */
+    async function removeQuantityFrom(uid: string, quantity: number) {
+        const data = document.get<InventoryExtension>();
+        if (!data.items) {
+            data.items = [];
+        }
+
+        const items = itemArrayManager.removeQuantityFrom(uid, quantity, data.items);
+        if (!items) {
+            return false;
+        }
+
+        await document.set<InventoryExtension>('items', items);
+        invoker.invokeOnItemsUpdated(vehicle, items);
+
+        return true;
+    }
+
+    /**
      * Get all items the player currently has available
      *
      * @return {Readonly<Item[]>}
@@ -225,6 +249,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
         has,
         invokeDecay,
         remove,
+        removeQuantityFrom,
         split,
         stack,
         update,

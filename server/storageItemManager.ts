@@ -161,6 +161,24 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
     }
 
     /**
+     * Remove a quantity of items from a specific item stack based on `uid`
+     *
+     * @param {string} uid
+     * @param {number} quantity
+     * @returns {boolean}
+     */
+    async function removeQuantityFrom(uid: string, quantity: number) {
+        const currentItems = await getInternal();
+        const items = itemArrayManager.removeQuantityFrom(uid, quantity, currentItems);
+        if (!items) {
+            return false;
+        }
+
+        await updateItems(currentItems);
+        return true;
+    }
+
+    /**
      * Stack two items together and leave remaining if stack is too large
      *
      * Saves to database
@@ -246,6 +264,10 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @return {Promise<void>}
      */
     async function invokeDecay(): Promise<void> {
+        if (document.noDecay) {
+            return;
+        }
+
         const currentItems = await getInternal();
         if (currentItems.length <= 0) {
             return;
@@ -266,6 +288,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         has,
         invokeDecay,
         remove,
+        removeQuantityFrom,
         split,
         stack,
         update,
