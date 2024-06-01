@@ -7,13 +7,8 @@ let isReady = false;
 
 export function useItemManagerDatabase() {
     async function init() {
-        const dbClient = await db.getClient();
-
-        try {
-            await dbClient.createCollection(ItemManagerConfig.collectionName);
-            await dbClient.createCollection(ItemManagerConfig.collectionNameForStorage);
-        } catch (err) {}
-
+        await db.createCollection(ItemManagerConfig.collectionName);
+        await db.createCollection(ItemManagerConfig.collectionNameForStorage);
         isReady = true;
     }
 
