@@ -13,8 +13,4 @@ export const ItemManagerConfig = {
         enabled: true,
         maxSlots: 16,
     },
-    // Determines how many item slots a toolbar has
-    toolbar: {
-        maxSlots: 5,
-    },
 };
