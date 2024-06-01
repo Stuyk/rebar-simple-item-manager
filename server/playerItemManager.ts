@@ -268,6 +268,21 @@ export function usePlayerItemManager(player: alt.Player) {
         return removeQuantityFrom(uid, 1);
     }
 
+    /**
+     * Decays any decayable items in the item list by 1, and removes decayed items
+     *
+     * @return {Promise<void>}
+     */
+    async function invokeDecay(): Promise<void> {
+        const data = document.get<InventoryExtension>();
+        if (!data.items) {
+            return;
+        }
+
+        const items = itemArrayManager.invokeDecay(data.items);
+        await document.set<InventoryExtension>('items', items);
+    }
+
     return {
         add,
         get,
@@ -277,11 +292,13 @@ export function usePlayerItemManager(player: alt.Player) {
         },
         getByUid,
         has,
+        invokeDecay,
         remove,
         removeQuantityFrom,
         split,
         stack,
         update,
         use,
+        useOne,
     };
 }

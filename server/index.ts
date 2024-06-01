@@ -9,6 +9,7 @@ import { useStorageItemManager } from './storageItemManager.js';
 import { useItemManagerDatabase } from './database.js';
 import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { useItemUsageManager } from './itemUsageManager.js';
+import { useItemArrayManager } from './itemArrayManager.js';
 
 const API_NAME = 'item-manager-api';
 const Rebar = useRebar();
@@ -16,6 +17,7 @@ const db = useItemManagerDatabase();
 
 function useApi() {
     return {
+        useItemArrayManager,
         useItemManager,
         useItemUsageManager,
         usePlayerItemManager,

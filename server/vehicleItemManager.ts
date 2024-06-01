@@ -199,6 +199,21 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
         return true;
     }
 
+    /**
+     * Decays any decayable items in the item list by 1, and removes decayed items
+     *
+     * @return {Promise<void>}
+     */
+    async function invokeDecay(): Promise<void> {
+        const data = document.get<InventoryExtension>();
+        if (!data.items) {
+            return;
+        }
+
+        const items = itemArrayManager.invokeDecay(data.items);
+        await document.set<InventoryExtension>('items', items);
+    }
+
     return {
         add,
         get,
@@ -208,6 +223,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return itemArrayManager.getErrorMessage();
         },
         has,
+        invokeDecay,
         remove,
         split,
         stack,

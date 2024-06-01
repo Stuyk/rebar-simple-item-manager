@@ -240,6 +240,21 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         return true;
     }
 
+    /**
+     * Decays any decayable items in the item list by 1, and removes decayed items
+     *
+     * @return {Promise<void>}
+     */
+    async function invokeDecay(): Promise<void> {
+        const currentItems = await getInternal();
+        if (currentItems.length <= 0) {
+            return;
+        }
+
+        const items = itemArrayManager.invokeDecay(currentItems);
+        await updateItems(items);
+    }
+
     return {
         add,
         get,
@@ -249,6 +264,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
             return itemArrayManager.getErrorMessage();
         },
         has,
+        invokeDecay,
         remove,
         split,
         stack,

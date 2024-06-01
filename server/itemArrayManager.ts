@@ -437,7 +437,7 @@ export function useItemArrayManager() {
         }
 
         // Handle decay when set to zero
-        if (typeof data.decay !== 'undefined' && data.decay === 0) {
+        if (typeof data.decay !== 'undefined' && data.decay <= 0) {
             items.slice(index, 1);
             return items;
         }
@@ -455,12 +455,36 @@ export function useItemArrayManager() {
         errorMessage = message;
     }
 
+    /**
+     * Any items that can be decayed, decay by 1 hr.
+     *
+     * @param {Item[]} items
+     * @return
+     */
+    function invokeDecay(items: Item[]) {
+        items = Utility.clone.arrayData(items);
+        for (let i = items.length - 1; i >= 0; i--) {
+            if (typeof items[i].decay === 'undefined') {
+                continue;
+            }
+
+            items[i].decay -= 1;
+
+            if (items[i].decay <= 0) {
+                items.slice(i, 1);
+            }
+        }
+
+        return items;
+    }
+
     return {
         add,
         getByUid,
         getData,
         getErrorMessage,
         has,
+        invokeDecay,
         remove,
         removeAt,
         removeQuantityFrom,

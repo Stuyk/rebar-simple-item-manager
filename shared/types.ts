@@ -96,17 +96,42 @@ export type BaseItem = {
     decay?: number;
 
     /**
+     * An arbitrary value that is the durability of the item. Other systems decide what to do when the item is used.
+     *
+     * When durability hits zero, all `use` calls will be halted and prevent usage.
+     *
+     * @type {number}
+     */
+    durability?: number;
+
+    /**
+     * The event name to call when the item is `used`.
+     *
+     * @type {string}
+     */
+    useEventName?: string;
+
+    /**
      * Optional ruleset to further describe how the item will work
      *
      * Item manager does not manage these rules, just a placeholder to help with rules
      */
     rules?: {
         /**
-         * Prevent the item from being traded, stored
+         * Prevent the item from being traded
          *
          * @type {boolean}
          */
-        noTradingOrStorage?: boolean;
+        noTrading?: boolean;
+
+        /**
+         * Disallow the item to enter any other storage compartments
+         *
+         * Such as vehicles, boxes, etc.
+         *
+         * @type {boolean}
+         */
+        noStorage?: boolean;
 
         /**
          * Destroy the item on drop
