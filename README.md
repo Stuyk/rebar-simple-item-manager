@@ -14,6 +14,8 @@ All inventory functions automatically save to the database, and simplifies overa
 -   Inventory Bindings for Vehicles
 -   Inventory Binder for General Purpose Usage, like Storage
 -   Events when added, removed, and updated
+-   Decay system for items
+-   Decay system for storages, online players, and vehicles
 
 ## API
 
