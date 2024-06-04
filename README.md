@@ -89,7 +89,7 @@ Removing an item works from the back of the array forward, and tries to remove t
 The removal will fail if there is not enough quantity of an item to remove.
 
 ```ts
-async function addSomeItem(player: alt.Player, id: string) {
+async function removeSomeItem(player: alt.Player, id: string) {
     const rebarPlayer = Rebar.usePlayer(player);
     const api = await Rebar.useApi().getAsync('item-manager-api');
     const itemManager = api.usePlayerItemManager(player);
@@ -102,6 +102,6 @@ async function addSomeItem(player: alt.Player, id: string) {
         return;
     }
 
-    rebarPlayer.notify.sendMessage(`Removed${quantity} ${id}`);
+    rebarPlayer.notify.sendMessage(`Removed ${quantity} ${id}`);
 }
 ```
