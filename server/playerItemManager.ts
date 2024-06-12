@@ -80,6 +80,20 @@ export function usePlayerItemManager(player: alt.Player) {
     }
 
     /**
+     * Removes all existing items in document.items (Character Items)
+     * Saves the updated inventory to the database.
+     *
+     * @returns {Promise<void>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
+     */
+    async function clearArray() {
+        const data = document.get();
+
+        data.items = [];
+
+        await document.set<InventoryExtension>('items', data.items);
+    }
+
+    /**
      * Remove a quantity of items from a specific item stack based on `uid`
      *
      * @param {string} uid
@@ -295,6 +309,7 @@ export function usePlayerItemManager(player: alt.Player) {
         invokeDecay,
         remove,
         removeQuantityFrom,
+        clearArray,
         split,
         stack,
         update,
