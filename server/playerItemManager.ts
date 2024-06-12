@@ -86,11 +86,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<void>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
     async function clearArray() {
-        const data = document.get();
-
-        data.items = [];
-
-        await document.set<InventoryExtension>('items', data.items);
+        await document.set<InventoryExtension>('items', []);
     }
 
     /**
