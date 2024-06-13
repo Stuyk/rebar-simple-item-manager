@@ -39,7 +39,7 @@ export function useItemUsageManager() {
             return false;
         }
 
-        for (let cb of callbacks[item.id]) {
+        for (let cb of callbacks[baseItem.useEventName]) {
             cb(player, item.uid);
         }
 
