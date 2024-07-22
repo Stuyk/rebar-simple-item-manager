@@ -328,7 +328,14 @@ export function useItemArrayManager() {
         }
 
         items[index].quantity -= amountToSplit;
-        items.push({ ...Utility.clone.objectData(items[index]), quantity: amountToSplit });
+        
+        const clonedItem: Item = Utility.clone.objectData(items[index]);
+        const newItem = {
+            ...clonedItem,
+            quantity: amountToSplit,
+            uid: Utility.uid.generate(),
+        };
+        items.push(newItem);
         return verifyStackAndWeight(items, options) ? items : undefined;
     }
 
