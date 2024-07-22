@@ -83,20 +83,14 @@ export function useItemArrayManager() {
         // Break any bindings
         items = Utility.clone.arrayData(items);
 
-        if (!options.maxSlots) {
-            options.maxSlots = ItemManagerConfig.slots.maxSlots;
-        }
-
-        if (!options.maxWeight) {
-            options.maxWeight = ItemManagerConfig.weight.maxWeight;
-        }
+        options.maxSlots = options.maxSlots || ItemManagerConfig.slots.maxSlots;
+        options.maxWeight = options.maxWeight || ItemManagerConfig.weight.maxWeight;
 
         // Handle Item Stacking
         if (baseItem.maxStack <= 1) {
             const uid = Utility.uid.generate();
             const newItem: Item = { ...baseItem, quantity, uid };
 
-            // Append custom data to the item, if present
             if (options.data) {
                 newItem.data = options.data;
             }
@@ -105,15 +99,9 @@ export function useItemArrayManager() {
             return verifyStackAndWeight(items, options) ? items : undefined;
         }
 
-        // Find items with the exact id, and add quantities of that item
-        // Adds items from beginning of inventory, to end of inventory
+        // Find items with the exact id and add quantities of that item
         for (let i = 0; i < items.length; i++) {
-            if (items[i].id !== id) {
-                continue;
-            }
-
-            // Exceed max stacked item
-            if (items[i].quantity === baseItem.maxStack) {
+            if (items[i].id !== id || items[i].quantity === baseItem.maxStack) {
                 continue;
             }
 
@@ -121,16 +109,11 @@ export function useItemArrayManager() {
                 break;
             }
 
-            // If quantity added is less than max stack for existing item, add it, break loop
-            if (items[i].quantity + quantity <= baseItem.maxStack) {
-                items[i].quantity += quantity;
-                quantity = 0;
-                continue;
-            }
+            const availableSpace = baseItem.maxStack - items[i].quantity;
+            const quantityToAdd = Math.min(availableSpace, quantity);
 
-            const diff = baseItem.maxStack - items[i].quantity;
-            items[i].quantity += diff;
-            quantity -= diff;
+            items[i].quantity += quantityToAdd;
+            quantity -= quantityToAdd;
         }
 
         // No more items to add
@@ -139,27 +122,11 @@ export function useItemArrayManager() {
         }
 
         // Continue adding items...
-        // If the quantity is less than the max stack, add it
-        if (quantity < baseItem.maxStack) {
+        while (quantity > 0) {
             const uid = Utility.uid.generate();
-            items.push({ ...baseItem, quantity, uid });
-        } else {
-            // If the quantity is greater than the max stack, determine how many items to add
-            const itemCountToAdd = Math.floor(quantity / baseItem.maxStack);
-            for (let i = 0; i < itemCountToAdd; i++) {
-                // If the quantity - max stack is less than zero, adjust actualQuantity to the real value
-                // Otherwise, always use max stack to keep adding
-                let actualQuantity = baseItem.maxStack;
-                if (quantity - baseItem.maxStack < 0) {
-                    actualQuantity = quantity;
-                }
-
-                const uid = Utility.uid.generate();
-                items.push({ ...baseItem, quantity: actualQuantity, uid });
-                quantity -= actualQuantity;
-                console.log(actualQuantity);
-                console.log(quantity);
-            }
+            const actualQuantity = Math.min(quantity, baseItem.maxStack);
+            items.push({ ...baseItem, quantity: actualQuantity, uid });
+            quantity -= actualQuantity;
         }
 
         return verifyStackAndWeight(items, options) ? items : undefined;
