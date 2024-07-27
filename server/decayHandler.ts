@@ -4,6 +4,7 @@ import { Storage } from '../shared/types.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { useStorageItemManager } from './storageItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
+import { usePlayerItemManager } from "./playerItemManager.js";
 
 const Rebar = useRebar();
 const RebarEvents = Rebar.events.useEvents();
