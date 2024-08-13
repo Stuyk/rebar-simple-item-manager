@@ -233,7 +233,7 @@ export function useItemArrayManager() {
             return undefined;
         }
 
-        const item = items.splice(index, 1);
+        const item = items.splice(index, 1)[0];
         return { items, item };
     }
 
@@ -328,7 +328,7 @@ export function useItemArrayManager() {
         }
 
         items[index].quantity -= amountToSplit;
-        
+
         const clonedItem: Item = Utility.clone.objectData(items[index]);
         const newItem = {
             ...clonedItem,

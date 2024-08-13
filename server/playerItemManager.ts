@@ -1,14 +1,11 @@
 import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
-import { AddOptions, InventoryExtension, Item } from '../shared/types.js';
+import { AddOptions, Item } from '../shared/types.js';
 import { useItemArrayManager } from './itemArrayManager.js';
 import { ItemIDs } from '../shared/ignoreItemIds.js';
-import { usePlayerItemManagerEventInvoker } from './playerItemManagerEvents.js';
 import { useItemUsageManager } from './itemUsageManager.js';
 
 const Rebar = useRebar();
-
-const invoker = usePlayerItemManagerEventInvoker();
 
 /**
  * Manages player items by interfacing with the player's inventory and item manager.
@@ -33,7 +30,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
     async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             data.items = [];
         }
@@ -43,11 +40,8 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemAdded(player, id, quantity);
-        invoker.invokeOnItemsUpdated(player, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, data.items);
         return true;
     }
 
@@ -60,22 +54,40 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
     async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             data.items = [];
         }
 
-        const initialQuantity = quantity;
         const items = itemArrayManager.remove(id, quantity, data.items);
         if (!items) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, items);
+        return true;
+    }
 
-        invoker.invokeOnItemRemoved(player, id, initialQuantity);
-        invoker.invokeOnItemsUpdated(player, items);
+    /**
+     * Remove an item based on uid, returns `true` if removed
+     *
+     * @param {string} uid
+     * @return
+     */
+    async function removeAt(uid: string) {
+        const data = document.get();
+        if (!data.items) {
+            data.items = [];
+        }
 
+        const results = itemArrayManager.removeAt(uid, data.items);
+        if (!results) {
+            return false;
+        }
+
+        await document.set('items', results.items);
+        alt.emit('rebar:entityItemsUpdated', player, results.items);
         return true;
     }
 
@@ -86,7 +98,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<void>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
     async function clearArray() {
-        await document.set<InventoryExtension>('items', []);
+        await document.set('items', []);
     }
 
     /**
@@ -97,7 +109,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {boolean}
      */
     async function removeQuantityFrom(uid: string, quantity: number) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             data.items = [];
         }
@@ -107,8 +119,8 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-        invoker.invokeOnItemsUpdated(player, items);
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, items);
         return true;
     }
 
@@ -118,7 +130,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Readonly<Item[]>} An array of items in the player's inventory.
      */
     function get(): Readonly<Item[]> {
-        return (document.get<InventoryExtension>().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
+        return (document.get().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
     }
 
     /**
@@ -152,7 +164,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {boolean} `true` if the player has enough of the item, otherwise `false`.
      */
     function has(id: ItemIDs, quantity: number) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -169,7 +181,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the items were stacked successfully, otherwise `false`.
      */
     async function stack(uidToStackOn: string, uidToStack: string) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -179,10 +191,8 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(player, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, items);
         return true;
     }
 
@@ -196,7 +206,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was split successfully, otherwise `false`.
      */
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -206,10 +216,8 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(player, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, items);
         return true;
     }
 
@@ -221,7 +229,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {boolean}
      */
     async function update(uid: string, data: Partial<Omit<Item, '_id'>>) {
-        const playerDocument = document.get<InventoryExtension>();
+        const playerDocument = document.get();
         if (!playerDocument.items) {
             return false;
         }
@@ -231,10 +239,8 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(player, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', player, items);
         return true;
     }
 
@@ -284,13 +290,13 @@ export function usePlayerItemManager(player: alt.Player) {
      * @return {Promise<void>}
      */
     async function invokeDecay(): Promise<void> {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return;
         }
 
         const items = itemArrayManager.invokeDecay(data.items);
-        await document.set<InventoryExtension>('items', items);
+        await document.set('items', items);
     }
 
     return {
@@ -304,6 +310,7 @@ export function usePlayerItemManager(player: alt.Player) {
         has,
         invokeDecay,
         remove,
+        removeAt,
         removeQuantityFrom,
         clearArray,
         split,

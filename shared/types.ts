@@ -1,18 +1,4 @@
-export type InventoryExtension = {
-    /**
-     * Items in the player's inventory
-     *
-     * @type {Array<Item>}
-     */
-    items?: Array<Item>;
-
-    /**
-     * The maximum number of inventory slots the player has.
-     *
-     * @type {number}
-     */
-    maxSlots?: number;
-};
+import { ICustomEmitEvent } from 'alt-server';
 
 export type Storage = {
     /**
@@ -42,7 +28,21 @@ export type Storage = {
      * @type {boolean}
      */
     noDecay?: boolean;
-} & InventoryExtension;
+
+    /**
+     * Items in the player's inventory
+     *
+     * @type {Array<Item>}
+     */
+    items?: Array<Item>;
+
+    /**
+     * The maximum number of inventory slots the player has.
+     *
+     * @type {number}
+     */
+    maxSlots?: number;
+};
 
 export type BaseItem = {
     /**
@@ -116,7 +116,7 @@ export type BaseItem = {
      *
      * @type {string}
      */
-    useEventName?: string;
+    useEventName?: keyof ICustomEmitEvent;
 
     /**
      * Optional ruleset to further describe how the item will work

@@ -3,9 +3,6 @@ import { Item } from '../shared/types.js';
 import { useItemManager } from './itemManager.js';
 import { ItemIDs } from '../shared/ignoreItemIds.js';
 
-type ItemUseCallback = (player: alt.Player, uid: string) => void;
-
-const callbacks: { [id: string]: ItemUseCallback[] } = {};
 const itemManger = useItemManager();
 
 export function useItemUsageManager() {
@@ -27,37 +24,11 @@ export function useItemUsageManager() {
 
         if (!baseItem.useEventName) {
             errorMessage = 'Base item does not have a usage callback';
-        }
-
-        if (!callbacks[baseItem.useEventName]) {
-            errorMessage = 'Item does not have any registered usage callbacks';
             return false;
         }
 
-        if (typeof item.durability !== 'undefined' && item.durability <= 0) {
-            errorMessage = 'Item is broken';
-            return false;
-        }
-
-        for (let cb of callbacks[baseItem.useEventName]) {
-            cb(player, item.uid);
-        }
-
+        alt.emit(baseItem.useEventName, player, item.uid);
         return true;
-    }
-
-    /**
-     * Listen for callbacks when a matching `useEventName` is invoked for a given item
-     *
-     * @param {string} useEventName
-     * @param {ItemUseCallback} callback
-     */
-    function on(useEventName: string, callback: ItemUseCallback) {
-        if (!callbacks[useEventName]) {
-            callbacks[useEventName] = [];
-        }
-
-        callbacks[useEventName].push(callback);
     }
 
     function getErrorMessage() {
@@ -66,7 +37,6 @@ export function useItemUsageManager() {
 
     return {
         getErrorMessage,
-        on,
         invoke,
     };
 }
