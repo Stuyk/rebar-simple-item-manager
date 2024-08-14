@@ -2,6 +2,7 @@ import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
 import { usePlayerItemManager } from './playerItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
+import { useItemManager } from './itemManager.js';
 
 const Rebar = useRebar();
 const Service = Rebar.services.useServiceRegister();
@@ -57,5 +58,21 @@ Service.register('itemService', {
         }
 
         return usePlayerItemManager(entity).useOne(uid);
+    },
+    async itemCreate(data) {
+        const itemManager = useItemManager();
+        if (!itemManager.has(data.id)) {
+            return;
+        }
+
+        await itemManager.create(data);
+    },
+    async itemRemove(id) {
+        const itemManager = useItemManager();
+        if (!itemManager.has(id)) {
+            return;
+        }
+
+        await itemManager.remove(id);
     },
 });

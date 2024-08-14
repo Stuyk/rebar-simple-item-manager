@@ -68,10 +68,10 @@ export function useItemManager() {
     /**
      * Remove an item from the database
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @return
      */
-    async function remove(id: string) {
+    async function remove(id: keyof RebarItems) {
         if (!databaseItems[id]) {
             return false;
         }
@@ -86,10 +86,10 @@ export function useItemManager() {
      *
      * Returns `undefined` if the item does not exist
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @return {(DatabaseBaseItem | undefined)}
      */
-    function getDatabaseItem(id: string): DatabaseBaseItem | undefined {
+    function getDatabaseItem(id: keyof RebarItems): DatabaseBaseItem | undefined {
         if (!databaseItems[id]) {
             return undefined;
         }
@@ -100,10 +100,10 @@ export function useItemManager() {
     /**
      * Returns a `BaseItem` clone, does not include `_id`
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @return
      */
-    function getBaseItem(id: string) {
+    function getBaseItem(id: keyof RebarItems) {
         if (!databaseItems[id]) {
             return undefined;
         }
@@ -116,10 +116,10 @@ export function useItemManager() {
     /**
      * Check if item `id` already exists
      *
-     * @param {string} id
+     * @param {RebarItems} id
      * @return
      */
-    function has(id: string) {
+    function has(id: keyof RebarItems) {
         return databaseItems[id] ? true : false;
     }
 

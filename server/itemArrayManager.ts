@@ -315,7 +315,7 @@ export function useItemArrayManager() {
             return undefined;
         }
 
-        const baseItem = itemManager.getBaseItem(items[index].id as string);
+        const baseItem = itemManager.getBaseItem(items[index].id);
         if (!baseItem) {
             errorMessage = 'Base item does not exist';
             return undefined;
@@ -365,7 +365,7 @@ export function useItemArrayManager() {
         }
 
         // Verify max stack values
-        const baseItem = itemManager.getBaseItem(items[stackIndex].id as string);
+        const baseItem = itemManager.getBaseItem(items[stackIndex].id);
         if (!baseItem || baseItem.maxStack <= 1) {
             errorMessage = 'Item cannot be stacked';
             return undefined;
