@@ -1,3 +1,4 @@
+import { Item, RebarBaseItem } from '@Shared/types/items.js';
 import { ICustomEmitEvent } from 'alt-server';
 
 export type Storage = {
@@ -44,7 +45,7 @@ export type Storage = {
     maxSlots?: number;
 };
 
-declare global {
+declare module '@Shared/types/items.js' {
     interface RebarBaseItem {
         /**
          * The number of in-game hours before this item expires. If this value is never set it never expires.
@@ -102,29 +103,6 @@ declare global {
         };
     }
 }
-
-export type Item = {
-    /**
-     * A unique string that is attached to the item.
-     *
-     * @type {string}
-     */
-    uid: string;
-
-    /**
-     * The number of items in the stack of items
-     *
-     * @type {number}
-     */
-    quantity: number;
-
-    /**
-     * Any custom data that belongs to the item
-     *
-     * @type {{ [key: string]: any }}
-     */
-    data?: { [key: string]: any };
-} & RebarBaseItem;
 
 export type AddOptions = {
     /**

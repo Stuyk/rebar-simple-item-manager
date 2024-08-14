@@ -114,3 +114,21 @@ async function removeSomeItem(player: alt.Player, id: string) {
     rebarPlayer.notify.sendMessage(`Removed ${quantity} ${id}`);
 }
 ```
+
+## Expanding Item Interfaces
+
+All interfaces from the base interfaces can be expanded / changed through declarations.
+
+By default `Item` inherits `RebaseBaseItem`.
+
+```ts
+declare module '@Shared/types/items.js' {
+    interface RebarBaseItem {
+        newField: string;
+    }
+
+    interface Item {
+        onlyItemField: string;
+    }
+}
+```

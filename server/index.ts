@@ -10,8 +10,7 @@ import { useItemArrayManager } from './itemArrayManager.js';
 import { usePlayerItemManager } from './playerItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
 import { useStorageItemManager } from './storageItemManager.js';
-
-import { Item } from '../shared/types.js';
+import { Item } from '@Shared/types/items.js';
 
 const API_NAME = 'item-manager-api';
 const Rebar = useRebar();

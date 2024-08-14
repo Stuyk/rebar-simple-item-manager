@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
-import { Item } from '../shared/types.js';
 import { useItemManager } from './itemManager.js';
+import { Item } from '@Shared/types/items.js';
 
 const itemManger = useItemManager();
 

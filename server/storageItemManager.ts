@@ -5,8 +5,9 @@ import { useRebar } from '@Server/index.js';
 import { useItemArrayManager } from './itemArrayManager.js';
 
 import { ItemManagerConfig } from '../shared/config.js';
-import { AddOptions, Item, Storage } from '../shared/types.js';
+import { AddOptions, Storage } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
+import { Item } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();

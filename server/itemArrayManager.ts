@@ -2,8 +2,9 @@ import * as Utility from '@Shared/utility/index.js';
 
 import { useItemManager } from './itemManager.js';
 
-import { AddOptions, Item } from '../shared/types.js';
+import { AddOptions } from '../shared/types.js';
 import { ItemManagerConfig } from '../shared/config.js';
+import { Item } from '@Shared/types/items.js';
 
 const itemManager = useItemManager();
 

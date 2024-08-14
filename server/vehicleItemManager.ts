@@ -1,7 +1,8 @@
 import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
-import { AddOptions, Item } from '../shared/types.js';
+import { AddOptions } from '../shared/types.js';
 import { useItemArrayManager } from './itemArrayManager.js';
+import { Item } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 
