@@ -3,7 +3,7 @@ import { useRebar } from '@Server/index.js';
 import * as Utility from '@Shared/utility/index.js';
 
 import { ItemManagerConfig } from '../shared/config.js';
-import { BaseItem, DatabaseBaseItem } from '../shared/types.js';
+import { DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
 
 const Rebar = useRebar();
@@ -18,7 +18,7 @@ async function init() {
 
     let items = await db.getAll<DatabaseBaseItem>(ItemManagerConfig.collectionName);
     if (!items || items.length <= 0) {
-        await db.create<BaseItem>(
+        await db.create<RebarBaseItem>(
             {
                 id: 'example',
                 name: 'Example Item',
@@ -46,9 +46,9 @@ export function useItemManager() {
     /**
      * Create an item, and add it to the database
      *
-     * @param {BaseItem} item
+     * @param {RebarBaseItem} item
      */
-    async function create(item: BaseItem) {
+    async function create(item: RebarBaseItem) {
         if (item.weight < 0) {
             item.weight = 0;
         }
@@ -110,7 +110,7 @@ export function useItemManager() {
 
         const item = Utility.clone.objectData<DatabaseBaseItem>(databaseItems[id]);
         delete item._id;
-        return item as BaseItem;
+        return item as RebarBaseItem;
     }
 
     /**

@@ -44,110 +44,64 @@ export type Storage = {
     maxSlots?: number;
 };
 
-export type BaseItem = {
-    /**
-     * A general purpose item identifier.
-     *
-     * Used for things like `food-burger`
-     *
-     * @type {keyof RebarItems}
-     */
-    id: keyof RebarItems;
-
-    /**
-     * The unique name of the item
-     *
-     * @type {string}
-     */
-    name: string;
-
-    /**
-     * The description of the item
-     *
-     * @type {string}
-     */
-    desc: string;
-
-    /**
-     * The maximum amount of items that can exist in this stack of items
-     *
-     * @type {number}
-     */
-    maxStack: number;
-
-    /**
-     * Weight per item, this is not the total weight.
-     *
-     * You'll want to do `quantity * weight` to see the total weight of the stack.
-     *
-     * @type {number}
-     */
-    weight: number;
-
-    /**
-     * Icon for the item with extension
-     *
-     * ie. `icon-burger.png`
-     *
-     * @type {string}
-     */
-    icon: string;
-
-    /**
-     * The number of in-game hours before this item expires. If this value is never set it never expires.
-     *
-     * If the decay is set to zero at any point, any decayed items will be removed.
-     *
-     * @type {number}
-     */
-    decay?: number;
-
-    /**
-     * An arbitrary value that is the durability of the item. Other systems decide what to do when the item is used.
-     *
-     * When durability hits zero, all `use` calls will be halted and prevent usage.
-     *
-     * @type {number}
-     */
-    durability?: number;
-
-    /**
-     * The event name to call when the item is `used`.
-     *
-     * @type {string}
-     */
-    useEventName?: keyof ICustomEmitEvent;
-
-    /**
-     * Optional ruleset to further describe how the item will work
-     *
-     * Item manager does not manage these rules, just a placeholder to help with rules
-     */
-    rules?: {
+declare global {
+    interface RebarBaseItem {
         /**
-         * Prevent the item from being traded
+         * The number of in-game hours before this item expires. If this value is never set it never expires.
          *
-         * @type {boolean}
+         * If the decay is set to zero at any point, any decayed items will be removed.
+         *
+         * @type {number}
          */
-        noTrading?: boolean;
+        decay?: number;
 
         /**
-         * Disallow the item to enter any other storage compartments
+         * An arbitrary value that is the durability of the item. Other systems decide what to do when the item is used.
          *
-         * Such as vehicles, boxes, etc.
+         * When durability hits zero, all `use` calls will be halted and prevent usage.
          *
-         * @type {boolean}
+         * @type {number}
          */
-        noStorage?: boolean;
+        durability?: number;
 
         /**
-         * Destroy the item on drop
+         * The event name to call when the item is `used`.
          *
-         * @type {boolean}
+         * @type {string}
          */
-        noDropping?: boolean;
-    };
-};
+        useEventName?: keyof ICustomEmitEvent;
+
+        /**
+         * Optional ruleset to further describe how the item will work
+         *
+         * Item manager does not manage these rules, just a placeholder to help with rules
+         */
+        rules?: {
+            /**
+             * Prevent the item from being traded
+             *
+             * @type {boolean}
+             */
+            noTrading?: boolean;
+
+            /**
+             * Disallow the item to enter any other storage compartments
+             *
+             * Such as vehicles, boxes, etc.
+             *
+             * @type {boolean}
+             */
+            noStorage?: boolean;
+
+            /**
+             * Destroy the item on drop
+             *
+             * @type {boolean}
+             */
+            noDropping?: boolean;
+        };
+    }
+}
 
 export type Item = {
     /**
@@ -170,7 +124,7 @@ export type Item = {
      * @type {{ [key: string]: any }}
      */
     data?: { [key: string]: any };
-} & BaseItem;
+} & RebarBaseItem;
 
 export type AddOptions = {
     /**
@@ -204,4 +158,4 @@ export type DatabaseBaseItem = {
      * @type {string}
      */
     _id: string;
-} & BaseItem;
+} & RebarBaseItem;

@@ -28,6 +28,13 @@ After starting your server, the `add` functions will give you auto-complete info
 Items are automatically saved into the database.
 
 ```ts
+declare global {
+    export interface RebarItems {
+        'food-burger': string;
+        'seed-pouch': string;
+    }
+}
+
 async function someFunction() {
     const api = await Rebar.useApi().getAsync('item-manager-api');
     const manager = api.useItemManager();
