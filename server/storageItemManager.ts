@@ -49,10 +49,12 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Saves to database
      *
-     * @param {Item} item
+     * @param {keyof RebarItems} id
+     * @param {number} quantity
+     * @param {AddOptions} [addOptions={}]
      * @return
      */
-    async function add(id: string, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
         const currentItems = await getInternal();
         const items = itemArrayManager.add(id, quantity, currentItems, addOptions);
         if (!items) {
@@ -71,11 +73,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Saves to database
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: string, quantity: number): Promise<boolean> {
+    async function remove(id: keyof RebarItems, quantity: number): Promise<boolean> {
         const currentItems = await getInternal();
         const initialQuantity = quantity;
         const items = itemArrayManager.remove(id, quantity, currentItems);
@@ -165,11 +167,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Returns `true / false`
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return
      */
-    async function has(id: string, quantity: number) {
+    async function has(id: keyof RebarItems, quantity: number) {
         const currentItems = await getInternal();
         return itemArrayManager.has(id, quantity, currentItems);
     }

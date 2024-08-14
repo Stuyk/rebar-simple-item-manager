@@ -50,9 +50,9 @@ export type BaseItem = {
      *
      * Used for things like `food-burger`
      *
-     * @type {string}
+     * @type {keyof RebarItems}
      */
-    id: string;
+    id: keyof RebarItems;
 
     /**
      * The unique name of the item

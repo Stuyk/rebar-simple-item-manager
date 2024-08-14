@@ -23,12 +23,12 @@ export function usePlayerItemManager(player: alt.Player) {
      * Adds a similar item based on `id` or creates a new item and adds it to the player's inventory.
      * Saves the updated inventory to the database.
      *
-     * @param {string} id - The ID of the item to add.
+     * @param {keyof RebarItems} id - The ID of the item to add.
      * @param {number} quantity - The quantity of the item to add.
      * @param {AddOptions} [addOptions={}] - Additional options for adding the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
-    async function add(id: string, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -48,11 +48,11 @@ export function usePlayerItemManager(player: alt.Player) {
      * Removes an item by `id` and quantity from the player's inventory.
      * Saves the updated inventory to the database.
      *
-     * @param {string} id - The ID of the item to remove.
+     * @param {keyof RebarItems} id - The ID of the item to remove.
      * @param {number} quantity - The quantity of the item to remove.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
-    async function remove(id: string, quantity: number): Promise<boolean> {
+    async function remove(id: keyof RebarItems, quantity: number): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -158,11 +158,11 @@ export function usePlayerItemManager(player: alt.Player) {
     /**
      * Checks if the player has enough of an item.
      *
-     * @param {string} id - The ID of the item to check.
+     * @param {keyof RebarItems} id - The ID of the item to check.
      * @param {number} quantity - The quantity of the item to check.
      * @returns {boolean} `true` if the player has enough of the item, otherwise `false`.
      */
-    function has(id: string, quantity: number) {
+    function has(id: keyof RebarItems, quantity: number) {
         const data = document.get();
         if (!data.items) {
             return false;

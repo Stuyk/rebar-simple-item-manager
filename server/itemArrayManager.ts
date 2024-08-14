@@ -64,13 +64,13 @@ export function useItemArrayManager() {
     /**
      * Adds any quantity of items based on id until
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @param {Item[]} items
      * @param {AddOptions} [options={}]
      * @return
      */
-    function add(id: string, quantity: number, items: Item[], options: AddOptions = {}) {
+    function add(id: keyof RebarItems, quantity: number, items: Item[], options: AddOptions = {}) {
         errorMessage = '';
 
         const baseItem = itemManager.getBaseItem(id);
@@ -170,12 +170,12 @@ export function useItemArrayManager() {
      *
      * Returns `undefined` if unable to remove enough items.
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @param {Item[]} items
      * @return
      */
-    function remove(id: string, quantity: number, items: Item[]) {
+    function remove(id: keyof RebarItems, quantity: number, items: Item[]) {
         errorMessage = '';
 
         // Verify the items array even has enough of the item outright
@@ -271,12 +271,12 @@ export function useItemArrayManager() {
     /**
      * Verify that an item array has enough of an item
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @param {Item[]} items
      * @return
      */
-    function has(id: string, quantity: number, items: Item[]) {
+    function has(id: keyof RebarItems, quantity: number, items: Item[]) {
         errorMessage = '';
 
         // Look through all items, and add their quantities together

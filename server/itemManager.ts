@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
 import * as Utility from '@Shared/utility/index.js';
@@ -7,7 +6,6 @@ import { ItemManagerConfig } from '../shared/config.js';
 import { BaseItem, DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
 
-const stringFilePath = './src/plugins/simple-item-manager/shared/ignorestring.ts';
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
 const managerDb = useItemManagerDatabase();

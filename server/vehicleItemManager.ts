@@ -14,10 +14,12 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Saves to database
      *
-     * @param {Item} item
+     * @param {keyof RebarItems} id
+     * @param {number} quantity
+     * @param {AddOptions} [addOptions={}]
      * @return
      */
-    async function add(id: string, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -38,11 +40,11 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Saves to database
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: string, quantity: number): Promise<boolean> {
+    async function remove(id: keyof RebarItems, quantity: number): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             return false;
@@ -120,11 +122,11 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Returns `true / false`
      *
-     * @param {string} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return
      */
-    function has(id: string, quantity: number) {
+    function has(id: keyof RebarItems, quantity: number) {
         const data = document.get();
         if (!data.items) {
             return false;

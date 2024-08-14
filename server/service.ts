@@ -9,22 +9,22 @@ const Service = Rebar.services.useServiceRegister();
 Service.register('itemService', {
     async add(entity, id, quantity, data) {
         if (entity instanceof alt.Player) {
-            return usePlayerItemManager(entity).add(id, quantity, { data });
+            return usePlayerItemManager(entity).add(id as keyof RebarItems, quantity, { data });
         }
 
         if (entity instanceof alt.Vehicle) {
-            return useVehicleItemManager(entity).add(id, quantity, { data });
+            return useVehicleItemManager(entity).add(id as keyof RebarItems, quantity, { data });
         }
 
         return false;
     },
     async has(entity, id, quantity) {
         if (entity instanceof alt.Player) {
-            return usePlayerItemManager(entity).has(id, quantity);
+            return usePlayerItemManager(entity).has(id as keyof RebarItems, quantity);
         }
 
         if (entity instanceof alt.Vehicle) {
-            return useVehicleItemManager(entity).has(id, quantity);
+            return useVehicleItemManager(entity).has(id as keyof RebarItems, quantity);
         }
 
         return false;
@@ -42,11 +42,11 @@ Service.register('itemService', {
     },
     async sub(entity, id, quantity) {
         if (entity instanceof alt.Player) {
-            return usePlayerItemManager(entity).remove(id, quantity);
+            return usePlayerItemManager(entity).remove(id as keyof RebarItems, quantity);
         }
 
         if (entity instanceof alt.Vehicle) {
-            return useVehicleItemManager(entity).remove(id, quantity);
+            return useVehicleItemManager(entity).remove(id as keyof RebarItems, quantity);
         }
 
         return false;
