@@ -4,7 +4,6 @@ import { useRebar } from '@Server/index.js';
 
 import { useItemArrayManager } from './itemArrayManager.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { AddOptions, Item, Storage } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
@@ -53,7 +52,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      * @param {Item} item
      * @return
      */
-    async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: string, quantity: number, addOptions: AddOptions = {}) {
         const currentItems = await getInternal();
         const items = itemArrayManager.add(id, quantity, currentItems, addOptions);
         if (!items) {
@@ -72,11 +71,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Saves to database
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
+    async function remove(id: string, quantity: number): Promise<boolean> {
         const currentItems = await getInternal();
         const initialQuantity = quantity;
         const items = itemArrayManager.remove(id, quantity, currentItems);
@@ -166,11 +165,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Returns `true / false`
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @return
      */
-    async function has(id: ItemIDs, quantity: number) {
+    async function has(id: string, quantity: number) {
         const currentItems = await getInternal();
         return itemArrayManager.has(id, quantity, currentItems);
     }

@@ -11,7 +11,6 @@ import { usePlayerItemManager } from './playerItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
 import { useStorageItemManager } from './storageItemManager.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { Item } from '../shared/types.js';
 
 const API_NAME = 'item-manager-api';
@@ -26,9 +25,6 @@ function useApi() {
         usePlayerItemManager,
         useStorageItemManager,
         useVehicleItemManager,
-        convertToId(name: string) {
-            return name as ItemIDs;
-        },
     };
 }
 

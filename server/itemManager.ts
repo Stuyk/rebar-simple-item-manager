@@ -3,12 +3,11 @@ import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
 import * as Utility from '@Shared/utility/index.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { BaseItem, DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
 
-const ItemIdsFilePath = './src/plugins/simple-item-manager/shared/ignoreItemIds.ts';
+const stringFilePath = './src/plugins/simple-item-manager/shared/ignorestring.ts';
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
 const managerDb = useItemManagerDatabase();
@@ -41,16 +40,6 @@ async function init() {
         databaseItems[item.id] = item;
     }
 
-    try {
-        let fileContent = '// This file is auto-generated \r\n';
-        fileContent += `export type ItemIDs = '${ids.length >= 1 ? ids.join(' | ') : ''}';`;
-        fs.writeFileSync(ItemIdsFilePath, fileContent);
-    } catch (err) {
-        alt.logWarning(
-            `If you renamed the folder 'simple-item-manager' please rename the plugin back to its original name`,
-        );
-    }
-
     alt.log(`Total Items - ${items.length}`);
     isReady = true;
 }
@@ -81,10 +70,10 @@ export function useItemManager() {
     /**
      * Remove an item from the database
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @return
      */
-    async function remove(id: ItemIDs) {
+    async function remove(id: string) {
         if (!databaseItems[id]) {
             return false;
         }
@@ -99,10 +88,10 @@ export function useItemManager() {
      *
      * Returns `undefined` if the item does not exist
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @return {(DatabaseBaseItem | undefined)}
      */
-    function getDatabaseItem(id: ItemIDs): DatabaseBaseItem | undefined {
+    function getDatabaseItem(id: string): DatabaseBaseItem | undefined {
         if (!databaseItems[id]) {
             return undefined;
         }
@@ -113,10 +102,10 @@ export function useItemManager() {
     /**
      * Returns a `BaseItem` clone, does not include `_id`
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @return
      */
-    function getBaseItem(id: ItemIDs) {
+    function getBaseItem(id: string) {
         if (!databaseItems[id]) {
             return undefined;
         }
@@ -129,10 +118,10 @@ export function useItemManager() {
     /**
      * Check if item `id` already exists
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @return
      */
-    function has(id: ItemIDs) {
+    function has(id: string) {
         return databaseItems[id] ? true : false;
     }
 

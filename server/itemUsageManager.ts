@@ -1,7 +1,6 @@
 import * as alt from 'alt-server';
 import { Item } from '../shared/types.js';
 import { useItemManager } from './itemManager.js';
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 
 const itemManger = useItemManager();
 
@@ -16,7 +15,7 @@ export function useItemUsageManager() {
      * @return
      */
     function invoke(player: alt.Player, item: Item) {
-        const baseItem = itemManger.getBaseItem(item.id as ItemIDs);
+        const baseItem = itemManger.getBaseItem(item.id);
         if (!baseItem) {
             errorMessage = 'Base item for event usage does not exist';
             return false;

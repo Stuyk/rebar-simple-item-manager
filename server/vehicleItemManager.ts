@@ -2,7 +2,6 @@ import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
 import { AddOptions, Item } from '../shared/types.js';
 import { useItemArrayManager } from './itemArrayManager.js';
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 
 const Rebar = useRebar();
 
@@ -18,7 +17,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @param {Item} item
      * @return
      */
-    async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: string, quantity: number, addOptions: AddOptions = {}) {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -39,11 +38,11 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Saves to database
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
+    async function remove(id: string, quantity: number): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             return false;
@@ -121,11 +120,11 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Returns `true / false`
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @return
      */
-    function has(id: ItemIDs, quantity: number) {
+    function has(id: string, quantity: number) {
         const data = document.get();
         if (!data.items) {
             return false;

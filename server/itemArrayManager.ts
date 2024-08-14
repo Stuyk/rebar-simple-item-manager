@@ -2,7 +2,6 @@ import * as Utility from '@Shared/utility/index.js';
 
 import { useItemManager } from './itemManager.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { AddOptions, Item } from '../shared/types.js';
 import { ItemManagerConfig } from '../shared/config.js';
 
@@ -65,13 +64,13 @@ export function useItemArrayManager() {
     /**
      * Adds any quantity of items based on id until
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @param {Item[]} items
      * @param {AddOptions} [options={}]
      * @return
      */
-    function add(id: ItemIDs, quantity: number, items: Item[], options: AddOptions = {}) {
+    function add(id: string, quantity: number, items: Item[], options: AddOptions = {}) {
         errorMessage = '';
 
         const baseItem = itemManager.getBaseItem(id);
@@ -171,12 +170,12 @@ export function useItemArrayManager() {
      *
      * Returns `undefined` if unable to remove enough items.
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @param {Item[]} items
      * @return
      */
-    function remove(id: ItemIDs, quantity: number, items: Item[]) {
+    function remove(id: string, quantity: number, items: Item[]) {
         errorMessage = '';
 
         // Verify the items array even has enough of the item outright
@@ -272,12 +271,12 @@ export function useItemArrayManager() {
     /**
      * Verify that an item array has enough of an item
      *
-     * @param {ItemIDs} id
+     * @param {string} id
      * @param {number} quantity
      * @param {Item[]} items
      * @return
      */
-    function has(id: ItemIDs, quantity: number, items: Item[]) {
+    function has(id: string, quantity: number, items: Item[]) {
         errorMessage = '';
 
         // Look through all items, and add their quantities together
@@ -316,7 +315,7 @@ export function useItemArrayManager() {
             return undefined;
         }
 
-        const baseItem = itemManager.getBaseItem(items[index].id as ItemIDs);
+        const baseItem = itemManager.getBaseItem(items[index].id as string);
         if (!baseItem) {
             errorMessage = 'Base item does not exist';
             return undefined;
@@ -366,7 +365,7 @@ export function useItemArrayManager() {
         }
 
         // Verify max stack values
-        const baseItem = itemManager.getBaseItem(items[stackIndex].id as ItemIDs);
+        const baseItem = itemManager.getBaseItem(items[stackIndex].id as string);
         if (!baseItem || baseItem.maxStack <= 1) {
             errorMessage = 'Item cannot be stacked';
             return undefined;
