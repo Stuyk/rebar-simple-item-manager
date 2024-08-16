@@ -73,7 +73,6 @@ export function useItemArrayManager() {
      */
     function add(id: keyof RebarItems, quantity: number, items: Item[], options: AddOptions = {}) {
         errorMessage = '';
-
         const baseItem = itemManager.getBaseItem(id);
         if (!baseItem) {
             errorMessage = 'Base item does not exist';

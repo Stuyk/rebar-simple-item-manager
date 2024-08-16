@@ -3,6 +3,7 @@ import { useRebar } from '@Server/index.js';
 import { usePlayerItemManager } from './playerItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
 import { useItemManager } from './itemManager.js';
+import { useItemArrayManager } from './itemArrayManager.js';
 
 const Rebar = useRebar();
 const Service = Rebar.services.useServiceRegister();
@@ -74,5 +75,16 @@ Service.register('itemService', {
         }
 
         await itemManager.remove(id);
+    },
+    async hasSpace(entity, item) {
+        if (entity instanceof alt.Player) {
+            return usePlayerItemManager(entity).add(item.id, item.quantity, { data: item.data }, true);
+        }
+
+        if (entity instanceof alt.Vehicle) {
+            return useVehicleItemManager(entity).add(item.id, item.quantity, { data: item.data }, true);
+        }
+
+        return false;
     },
 });

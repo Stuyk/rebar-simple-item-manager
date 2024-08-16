@@ -29,7 +29,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {AddOptions} [addOptions={}] - Additional options for adding the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
-    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}, skipSave = false) {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -40,7 +40,10 @@ export function usePlayerItemManager(player: alt.Player) {
             return false;
         }
 
-        await document.set('items', items);
+        if (!skipSave) {
+            await document.set('items', items);
+        }
+
         alt.emit('rebar:entityItemsUpdated', player, data.items);
         return true;
     }

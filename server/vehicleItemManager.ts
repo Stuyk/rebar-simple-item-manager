@@ -20,7 +20,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @param {AddOptions} [addOptions={}]
      * @return
      */
-    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}, skipSave = false) {
         const data = document.get();
         if (!data.items) {
             data.items = [];
@@ -31,7 +31,10 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set('items', items);
+        if (!skipSave) {
+            await document.set('items', items);
+        }
+
         alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
