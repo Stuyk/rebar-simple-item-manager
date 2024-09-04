@@ -26,7 +26,7 @@ export function useItemUsageManager() {
             return false;
         }
 
-        alt.emit(baseItem.useEventName, player, item.uid);
+        alt.emit(baseItem.useEventName, player, item);
         return true;
     }
 
