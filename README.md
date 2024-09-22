@@ -28,6 +28,13 @@ After starting your server, the `add` functions will give you auto-complete info
 Items are automatically saved into the database.
 
 ```ts
+declare global {
+    export interface RebarItems {
+        'food-burger': string;
+        'seed-pouch': string;
+    }
+}
+
 async function someFunction() {
     const api = await Rebar.useApi().getAsync('item-manager-api');
     const manager = api.useItemManager();
@@ -105,5 +112,23 @@ async function removeSomeItem(player: alt.Player, id: string) {
     }
 
     rebarPlayer.notify.sendMessage(`Removed ${quantity} ${id}`);
+}
+```
+
+## Expanding Item Interfaces
+
+All interfaces from the base interfaces can be expanded / changed through declarations.
+
+By default `Item` inherits `RebaseBaseItem`.
+
+```ts
+declare module '@Shared/types/items.js' {
+    interface RebarBaseItem {
+        newField: string;
+    }
+
+    interface Item {
+        onlyItemField: string;
+    }
 }
 ```

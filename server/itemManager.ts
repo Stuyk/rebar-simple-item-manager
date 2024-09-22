@@ -1,14 +1,12 @@
-import * as fs from 'fs';
 import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
 import * as Utility from '@Shared/utility/index.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { ItemManagerConfig } from '../shared/config.js';
-import { BaseItem, DatabaseBaseItem } from '../shared/types.js';
+import { DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
+import { RebarBaseItem } from '@Shared/types/items.js';
 
-const ItemIdsFilePath = './src/plugins/simple-item-manager/shared/ignoreItemIds.ts';
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
 const managerDb = useItemManagerDatabase();
@@ -21,7 +19,7 @@ async function init() {
 
     let items = await db.getAll<DatabaseBaseItem>(ItemManagerConfig.collectionName);
     if (!items || items.length <= 0) {
-        await db.create<BaseItem>(
+        await db.create<RebarBaseItem>(
             {
                 id: 'example',
                 name: 'Example Item',
@@ -41,16 +39,6 @@ async function init() {
         databaseItems[item.id] = item;
     }
 
-    try {
-        let fileContent = '// This file is auto-generated \r\n';
-        fileContent += `export type ItemIDs = '${ids.length >= 1 ? ids.join(' | ') : ''}';`;
-        fs.writeFileSync(ItemIdsFilePath, fileContent);
-    } catch (err) {
-        alt.logWarning(
-            `If you renamed the folder 'simple-item-manager' please rename the plugin back to its original name`,
-        );
-    }
-
     alt.log(`Total Items - ${items.length}`);
     isReady = true;
 }
@@ -59,9 +47,9 @@ export function useItemManager() {
     /**
      * Create an item, and add it to the database
      *
-     * @param {BaseItem} item
+     * @param {RebarBaseItem} item
      */
-    async function create(item: BaseItem) {
+    async function create(item: RebarBaseItem) {
         if (item.weight < 0) {
             item.weight = 0;
         }
@@ -81,10 +69,10 @@ export function useItemManager() {
     /**
      * Remove an item from the database
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @return
      */
-    async function remove(id: ItemIDs) {
+    async function remove(id: keyof RebarItems) {
         if (!databaseItems[id]) {
             return false;
         }
@@ -99,10 +87,10 @@ export function useItemManager() {
      *
      * Returns `undefined` if the item does not exist
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @return {(DatabaseBaseItem | undefined)}
      */
-    function getDatabaseItem(id: ItemIDs): DatabaseBaseItem | undefined {
+    function getDatabaseItem(id: keyof RebarItems): DatabaseBaseItem | undefined {
         if (!databaseItems[id]) {
             return undefined;
         }
@@ -113,26 +101,26 @@ export function useItemManager() {
     /**
      * Returns a `BaseItem` clone, does not include `_id`
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @return
      */
-    function getBaseItem(id: ItemIDs) {
+    function getBaseItem(id: keyof RebarItems) {
         if (!databaseItems[id]) {
             return undefined;
         }
 
         const item = Utility.clone.objectData<DatabaseBaseItem>(databaseItems[id]);
         delete item._id;
-        return item as BaseItem;
+        return item as RebarBaseItem;
     }
 
     /**
      * Check if item `id` already exists
      *
-     * @param {ItemIDs} id
+     * @param {RebarItems} id
      * @return
      */
-    function has(id: ItemIDs) {
+    function has(id: keyof RebarItems) {
         return databaseItems[id] ? true : false;
     }
 

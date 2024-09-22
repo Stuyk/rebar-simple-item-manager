@@ -3,16 +3,14 @@ import * as Utility from '@Shared/utility/index.js';
 import { useRebar } from '@Server/index.js';
 
 import { useItemArrayManager } from './itemArrayManager.js';
-import { useStorageItemManagerInvoker } from './storageItemManagerEvents.js';
 
-import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { ItemManagerConfig } from '../shared/config.js';
-import { AddOptions, Item, Storage } from '../shared/types.js';
+import { AddOptions, Storage } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
+import { Item } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
-const invoker = useStorageItemManagerInvoker();
 const managerDb = useItemManagerDatabase();
 
 /**
@@ -52,10 +50,12 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Saves to database
      *
-     * @param {Item} item
+     * @param {keyof RebarItems} id
+     * @param {number} quantity
+     * @param {AddOptions} [addOptions={}]
      * @return
      */
-    async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}) {
         const currentItems = await getInternal();
         const items = itemArrayManager.add(id, quantity, currentItems, addOptions);
         if (!items) {
@@ -64,9 +64,8 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
 
         await updateItems(items);
 
-        invoker.invokeOnItemAdded(identifier, id, quantity);
-        invoker.invokeOnItemsUpdated(identifier, items);
-
+        alt.emit('rebar:storageItemAdded', identifier, id, quantity);
+        alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
 
@@ -75,11 +74,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Saves to database
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
+    async function remove(id: keyof RebarItems, quantity: number): Promise<boolean> {
         const currentItems = await getInternal();
         const initialQuantity = quantity;
         const items = itemArrayManager.remove(id, quantity, currentItems);
@@ -89,9 +88,27 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
 
         await updateItems(items);
 
-        invoker.invokeOnItemRemoved(identifier, id, initialQuantity);
-        invoker.invokeOnItemsUpdated(identifier, items);
+        alt.emit('rebar:storageItemRemoved', identifier, id, initialQuantity);
+        alt.emit('rebar:storageItemsUpdated', identifier, items);
+        return true;
+    }
 
+    /**
+     * Remove an item based on a given uid
+     *
+     * @param {string} uid
+     * @return
+     */
+    async function removeAt(uid: string) {
+        const currentItems = await getInternal();
+        const results = itemArrayManager.removeAt(uid, currentItems);
+        if (!results) {
+            return false;
+        }
+
+        await updateItems(results.items);
+        alt.emit('rebar:storageItemRemoved', identifier, results.item.id, results.item.quantity);
+        alt.emit('rebar:storageItemsUpdated', identifier, results.items);
         return true;
     }
 
@@ -151,11 +168,11 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      *
      * Returns `true / false`
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return
      */
-    async function has(id: ItemIDs, quantity: number) {
+    async function has(id: keyof RebarItems, quantity: number) {
         const currentItems = await getInternal();
         return itemArrayManager.has(id, quantity, currentItems);
     }
@@ -195,9 +212,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         }
 
         await updateItems(items);
-
-        invoker.invokeOnItemsUpdated(identifier, items);
-
+        alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
 
@@ -219,9 +234,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         }
 
         await updateItems(items);
-
-        invoker.invokeOnItemsUpdated(identifier, items);
-
+        alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
 
@@ -252,9 +265,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         }
 
         await updateItems(items);
-
-        invoker.invokeOnItemsUpdated(identifier, items);
-
+        alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
 
@@ -288,6 +299,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         has,
         invokeDecay,
         remove,
+        removeAt,
         removeQuantityFrom,
         split,
         stack,

@@ -1,12 +1,10 @@
 import * as alt from 'alt-server';
 import { useRebar } from '@Server/index.js';
-import { AddOptions, InventoryExtension, Item } from '../shared/types.js';
+import { AddOptions } from '../shared/types.js';
 import { useItemArrayManager } from './itemArrayManager.js';
-import { ItemIDs } from '../shared/ignoreItemIds.js';
-import { useVehicleItemManagerEventInvoker } from './vehicleItemManagerEvents.js';
+import { Item } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
-const invoker = useVehicleItemManagerEventInvoker();
 
 export function useVehicleItemManager(vehicle: alt.Vehicle) {
     const itemArrayManager = useItemArrayManager();
@@ -17,11 +15,13 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Saves to database
      *
-     * @param {Item} item
+     * @param {keyof RebarItems} id
+     * @param {number} quantity
+     * @param {AddOptions} [addOptions={}]
      * @return
      */
-    async function add(id: ItemIDs, quantity: number, addOptions: AddOptions = {}) {
-        const data = document.get<InventoryExtension>();
+    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}, skipSave = false) {
+        const data = document.get();
         if (!data.items) {
             data.items = [];
         }
@@ -31,11 +31,11 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
+        if (!skipSave) {
+            await document.set('items', items);
+        }
 
-        invoker.invokeOnItemAdded(vehicle, id, quantity);
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -44,12 +44,12 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Saves to database
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return {Promise<boolean>}
      */
-    async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
-        const data = document.get<InventoryExtension>();
+    async function remove(id: keyof RebarItems, quantity: number): Promise<boolean> {
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -60,11 +60,8 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemRemoved(vehicle, id, initialQuantity);
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -76,7 +73,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @returns {boolean}
      */
     async function removeQuantityFrom(uid: string, quantity: number) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             data.items = [];
         }
@@ -86,9 +83,8 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -98,7 +94,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @return {Readonly<Item[]>}
      */
     function get(): Readonly<Item[]> {
-        return (document.get<InventoryExtension>().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
+        return (document.get().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
     }
 
     /**
@@ -130,12 +126,12 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      *
      * Returns `true / false`
      *
-     * @param {ItemIDs} id
+     * @param {keyof RebarItems} id
      * @param {number} quantity
      * @return
      */
-    function has(id: ItemIDs, quantity: number) {
-        const data = document.get<InventoryExtension>();
+    function has(id: keyof RebarItems, quantity: number) {
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -153,7 +149,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @return
      */
     async function stack(uidToStackOn: string, uidToStack: string) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -163,10 +159,8 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -181,7 +175,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @return
      */
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return false;
         }
@@ -191,10 +185,8 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -206,7 +198,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @returns {boolean}
      */
     async function update(uid: string, data: Partial<Omit<Item, '_id'>>) {
-        const vehicleDocument = document.get<InventoryExtension>();
+        const vehicleDocument = document.get();
         if (!vehicleDocument.items) {
             return false;
         }
@@ -216,10 +208,8 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
             return false;
         }
 
-        await document.set<InventoryExtension>('items', items);
-
-        invoker.invokeOnItemsUpdated(vehicle, items);
-
+        await document.set('items', items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, items);
         return true;
     }
 
@@ -229,13 +219,35 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @return {Promise<void>}
      */
     async function invokeDecay(): Promise<void> {
-        const data = document.get<InventoryExtension>();
+        const data = document.get();
         if (!data.items) {
             return;
         }
 
         const items = itemArrayManager.invokeDecay(data.items);
-        await document.set<InventoryExtension>('items', items);
+        await document.set('items', items);
+    }
+
+    /**
+     * Remove an item based on uid, returns `true` if removed
+     *
+     * @param {string} uid
+     * @return
+     */
+    async function removeAt(uid: string) {
+        const data = document.get();
+        if (!data.items) {
+            data.items = [];
+        }
+
+        const results = itemArrayManager.removeAt(uid, data.items);
+        if (!results) {
+            return false;
+        }
+
+        await document.set('items', results.items);
+        alt.emit('rebar:entityItemsUpdated', vehicle, results.items);
+        return true;
     }
 
     return {
@@ -249,6 +261,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
         has,
         invokeDecay,
         remove,
+        removeAt,
         removeQuantityFrom,
         split,
         stack,

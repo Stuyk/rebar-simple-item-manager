@@ -1,18 +1,5 @@
-export type InventoryExtension = {
-    /**
-     * Items in the player's inventory
-     *
-     * @type {Array<Item>}
-     */
-    items?: Array<Item>;
-
-    /**
-     * The maximum number of inventory slots the player has.
-     *
-     * @type {number}
-     */
-    maxSlots?: number;
-};
+import { Item, RebarBaseItem } from '@Shared/types/items.js';
+import { ICustomEmitEvent } from 'alt-server';
 
 export type Storage = {
     /**
@@ -42,135 +29,80 @@ export type Storage = {
      * @type {boolean}
      */
     noDecay?: boolean;
-} & InventoryExtension;
 
-export type BaseItem = {
     /**
-     * A general purpose item identifier.
+     * Items in the player's inventory
      *
-     * Used for things like `food-burger`
-     *
-     * @type {string}
+     * @type {Array<Item>}
      */
-    id: string;
+    items?: Array<Item>;
 
     /**
-     * The unique name of the item
-     *
-     * @type {string}
-     */
-    name: string;
-
-    /**
-     * The description of the item
-     *
-     * @type {string}
-     */
-    desc: string;
-
-    /**
-     * The maximum amount of items that can exist in this stack of items
+     * The maximum number of inventory slots the player has.
      *
      * @type {number}
      */
-    maxStack: number;
-
-    /**
-     * Weight per item, this is not the total weight.
-     *
-     * You'll want to do `quantity * weight` to see the total weight of the stack.
-     *
-     * @type {number}
-     */
-    weight: number;
-
-    /**
-     * Icon for the item with extension
-     *
-     * ie. `icon-burger.png`
-     *
-     * @type {string}
-     */
-    icon: string;
-
-    /**
-     * The number of in-game hours before this item expires. If this value is never set it never expires.
-     *
-     * If the decay is set to zero at any point, any decayed items will be removed.
-     *
-     * @type {number}
-     */
-    decay?: number;
-
-    /**
-     * An arbitrary value that is the durability of the item. Other systems decide what to do when the item is used.
-     *
-     * When durability hits zero, all `use` calls will be halted and prevent usage.
-     *
-     * @type {number}
-     */
-    durability?: number;
-
-    /**
-     * The event name to call when the item is `used`.
-     *
-     * @type {string}
-     */
-    useEventName?: string;
-
-    /**
-     * Optional ruleset to further describe how the item will work
-     *
-     * Item manager does not manage these rules, just a placeholder to help with rules
-     */
-    rules?: {
-        /**
-         * Prevent the item from being traded
-         *
-         * @type {boolean}
-         */
-        noTrading?: boolean;
-
-        /**
-         * Disallow the item to enter any other storage compartments
-         *
-         * Such as vehicles, boxes, etc.
-         *
-         * @type {boolean}
-         */
-        noStorage?: boolean;
-
-        /**
-         * Destroy the item on drop
-         *
-         * @type {boolean}
-         */
-        noDropping?: boolean;
-    };
+    maxSlots?: number;
 };
 
-export type Item = {
-    /**
-     * A unique string that is attached to the item.
-     *
-     * @type {string}
-     */
-    uid: string;
+declare module '@Shared/types/items.js' {
+    interface RebarBaseItem {
+        /**
+         * The number of in-game hours before this item expires. If this value is never set it never expires.
+         *
+         * If the decay is set to zero at any point, any decayed items will be removed.
+         *
+         * @type {number}
+         */
+        decay?: number;
 
-    /**
-     * The number of items in the stack of items
-     *
-     * @type {number}
-     */
-    quantity: number;
+        /**
+         * An arbitrary value that is the durability of the item. Other systems decide what to do when the item is used.
+         *
+         * When durability hits zero, all `use` calls will be halted and prevent usage.
+         *
+         * @type {number}
+         */
+        durability?: number;
 
-    /**
-     * Any custom data that belongs to the item
-     *
-     * @type {{ [key: string]: any }}
-     */
-    data?: { [key: string]: any };
-} & BaseItem;
+        /**
+         * The event name to call when the item is `used`.
+         *
+         * @type {string}
+         */
+        useEventName?: keyof ICustomEmitEvent;
+
+        /**
+         * Optional ruleset to further describe how the item will work
+         *
+         * Item manager does not manage these rules, just a placeholder to help with rules
+         */
+        rules?: {
+            /**
+             * Prevent the item from being traded
+             *
+             * @type {boolean}
+             */
+            noTrading?: boolean;
+
+            /**
+             * Disallow the item to enter any other storage compartments
+             *
+             * Such as vehicles, boxes, etc.
+             *
+             * @type {boolean}
+             */
+            noStorage?: boolean;
+
+            /**
+             * Destroy the item on drop
+             *
+             * @type {boolean}
+             */
+            noDropping?: boolean;
+        };
+    }
+}
 
 export type AddOptions = {
     /**
@@ -204,4 +136,4 @@ export type DatabaseBaseItem = {
      * @type {string}
      */
     _id: string;
-} & BaseItem;
+} & RebarBaseItem;
