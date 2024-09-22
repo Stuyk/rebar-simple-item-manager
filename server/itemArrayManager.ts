@@ -4,7 +4,7 @@ import { useItemManager } from './itemManager.js';
 
 import { AddOptions } from '../shared/types.js';
 import { ItemManagerConfig } from '../shared/config.js';
-import { Item } from '@Shared/types/items.js';
+import { Item, RebarItems } from '@Shared/types/items.js';
 
 const itemManager = useItemManager();
 

@@ -5,7 +5,7 @@ import * as Utility from '@Shared/utility/index.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
-import { RebarBaseItem } from '@Shared/types/items.js';
+import { RebarBaseItem, RebarItems } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
