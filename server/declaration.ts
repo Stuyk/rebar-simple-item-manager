@@ -1,7 +1,7 @@
-import { Item } from '@Plugins/simple-item-manager/shared/types.js';
+import { Item } from '@Shared/types/items.js';
 
-declare global {
-    export interface RebarItems {
+declare module '@Shared/types/items.js' {
+    interface RebarItems {
         example: string;
     }
 }
