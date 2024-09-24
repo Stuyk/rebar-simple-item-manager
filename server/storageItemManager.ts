@@ -191,7 +191,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
             return false;
         }
 
-        await updateItems(currentItems);
+        await updateItems(items);
         return true;
     }
 
