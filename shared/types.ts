@@ -136,11 +136,4 @@ export type DatabaseBaseItem = {
      * @type {string}
      */
     _id: string;
-
-    /**
-     * The UID for the Base Item
-     *
-     * @type {string}
-     */
-    uid: string;
 } & RebarBaseItem;
