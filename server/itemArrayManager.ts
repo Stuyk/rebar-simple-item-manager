@@ -147,6 +147,7 @@ export function useItemArrayManager() {
 
         return item ? (item as Readonly<Item>) : undefined;
     }
+
     /**
      * Gets any custom data that is attached to an item
      *
@@ -154,7 +155,6 @@ export function useItemArrayManager() {
      * @param {string} uid
      * @return {(Readonly<T> | undefined)}
      */
-
     function getData<T = Object>(uid: string, items: Readonly<(Item | null)[]>): Readonly<T> | undefined {
         const item = getByUid(uid, items);
         if (!item) {
