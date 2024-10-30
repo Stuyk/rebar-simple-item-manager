@@ -67,6 +67,37 @@ export function useItemManager() {
     }
 
     /**
+     * Update an item in the database if the base item has changed
+     *
+     * @param {RebarBaseItem} item
+     */
+    async function update(item: RebarBaseItem): Promise<boolean> {
+        await alt.Utils.waitFor(() => isReady, 60000 * 2);
+        if (!databaseItems[item.id]) {
+            return false;
+        }
+
+        const existingItem = databaseItems[item.id];
+        const hasChanged = Object.keys(item).some((key) => {
+            return item[key] !== existingItem[key];
+        });
+
+        if (hasChanged) {
+            try {
+                const result = await db.update({ ...existingItem, ...item }, ItemManagerConfig.collectionName);
+                if (result) {
+                    databaseItems[item.id] = { ...existingItem, ...item };
+                    return true;
+                }
+            } catch (err) {
+                console.error(`Failed to update item with id ${item.id}:`, err);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Remove an item from the database
      *
      * @param {keyof RebarItems} id
@@ -126,6 +157,7 @@ export function useItemManager() {
 
     return {
         create,
+        update,
         getBaseItem,
         getDatabaseItem,
         has,
