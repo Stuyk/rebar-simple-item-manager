@@ -137,17 +137,16 @@ export function useItemArrayManager() {
      * @param {string} uid
      * @returns {Item | undefined}
      */
-    function getByUid(uid: string, items: Readonly<Item[]>) {
+    function getByUid(uid: string, items: Readonly<(Item | null)[]>) {
         errorMessage = '';
 
-        const item = items.find((x) => x.uid === uid);
+        const item = items.filter((x): x is Item => x !== null).find((x) => x.uid === uid);
         if (!item) {
-            errorMessage = `Unable to get item by uid, item does not exist`;
+            errorMessage = 'Unable to get item by uid, item does not exist';
         }
 
         return item ? (item as Readonly<Item>) : undefined;
     }
-
     /**
      * Gets any custom data that is attached to an item
      *
@@ -155,10 +154,10 @@ export function useItemArrayManager() {
      * @param {string} uid
      * @return {(Readonly<T> | undefined)}
      */
-    function getData<T = Object>(uid: string, items: Readonly<Item[]>): Readonly<T> | undefined {
+
+    function getData<T = Object>(uid: string, items: Readonly<(Item | null)[]>): Readonly<T> | undefined {
         const item = getByUid(uid, items);
         if (!item) {
-            // Error already defined
             return undefined;
         }
 

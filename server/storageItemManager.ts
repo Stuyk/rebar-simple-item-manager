@@ -7,7 +7,7 @@ import { useItemArrayManager } from './itemArrayManager.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { AddOptions, Storage } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
-import { Item } from '@Shared/types/items.js';
+import { Item, RebarItems } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
@@ -64,7 +64,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
 
         await updateItems(items);
 
-        alt.emit('rebar:storageItemAdded', identifier, id, quantity);
+        alt.emit('rebar:storageItemAdded', identifier, id.toString(), quantity);
         alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
@@ -88,7 +88,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
 
         await updateItems(items);
 
-        alt.emit('rebar:storageItemRemoved', identifier, id, initialQuantity);
+        alt.emit('rebar:storageItemRemoved', identifier, id.toString(), initialQuantity);
         alt.emit('rebar:storageItemsUpdated', identifier, items);
         return true;
     }
@@ -107,7 +107,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         }
 
         await updateItems(results.items);
-        alt.emit('rebar:storageItemRemoved', identifier, results.item.id, results.item.quantity);
+        alt.emit('rebar:storageItemRemoved', identifier, results.item.id.toString(), results.item.quantity);
         alt.emit('rebar:storageItemsUpdated', identifier, results.items);
         return true;
     }
