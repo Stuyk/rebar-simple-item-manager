@@ -3,7 +3,7 @@ import { useRebar } from '@Server/index.js';
 import { AddOptions } from '../shared/types.js';
 import { useItemArrayManager } from './itemArrayManager.js';
 import { useItemUsageManager } from './itemUsageManager.js';
-import { Item } from '@Shared/types/items.js';
+import { Item, RebarItems } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 
@@ -29,13 +29,18 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {AddOptions} [addOptions={}] - Additional options for adding the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
-    async function add(id: keyof RebarItems, quantity: number, addOptions: AddOptions = {}, skipSave = false) {
+    async function add(
+        id: keyof RebarItems,
+        quantity: number,
+        addOptions: AddOptions = {},
+        skipSave = false,
+    ): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             data.items = [];
         }
 
-        const items = itemArrayManager.add(id, quantity, data.items, addOptions);
+        const items = itemArrayManager.add(id.toString(), quantity, data.items, addOptions);
         if (!items) {
             return false;
         }
@@ -100,7 +105,7 @@ export function usePlayerItemManager(player: alt.Player) {
      *
      * @returns {Promise<void>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
-    async function clearArray() {
+    async function clearArray(): Promise<void> {
         await document.set('items', []);
     }
 
@@ -132,10 +137,12 @@ export function usePlayerItemManager(player: alt.Player) {
      *
      * @returns {Readonly<Item[]>} An array of items in the player's inventory.
      */
-    function get(): Readonly<Item[]> {
-        return (document.get().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>);
+    function get(): { items: Readonly<Item[]>; toolbar: Readonly<Item[]> } {
+        return {
+            items: (document.get().items as Readonly<Item[]>) ?? ([] as Readonly<Item[]>),
+            toolbar: (document.get().toolbar as Readonly<Item[]>) ?? ([] as Readonly<Item[]>),
+        };
     }
-
     /**
      * Gets an item based on uid, returns `undefined` if not found
      *
@@ -143,8 +150,10 @@ export function usePlayerItemManager(player: alt.Player) {
      * @returns {Readonly<Item> | undefined}
      */
     function getByUid(uid: string) {
-        const items = get();
-        return itemArrayManager.getByUid(uid, items);
+        const { items, toolbar } = get();
+        const combinedItems = [...items, ...toolbar];
+
+        return itemArrayManager.getByUid(uid, combinedItems);
     }
 
     /**
@@ -155,8 +164,10 @@ export function usePlayerItemManager(player: alt.Player) {
      * @return {(Readonly<T> | undefined)}
      */
     function getData<T = Object>(uid: string): Readonly<T> | undefined {
-        const items = get();
-        return itemArrayManager.getData(uid, items);
+        const { items, toolbar } = get();
+
+        const combinedItems = [...items, ...toolbar];
+        return itemArrayManager.getData(uid, combinedItems);
     }
 
     /**
@@ -166,7 +177,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {number} quantity - The quantity of the item to check.
      * @returns {boolean} `true` if the player has enough of the item, otherwise `false`.
      */
-    function has(id: keyof RebarItems, quantity: number) {
+    function has(id: keyof RebarItems, quantity: number): boolean {
         const data = document.get();
         if (!data.items) {
             return false;
@@ -183,7 +194,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {string} uidToStack - The UID of the item to be stacked.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the items were stacked successfully, otherwise `false`.
      */
-    async function stack(uidToStackOn: string, uidToStack: string) {
+    async function stack(uidToStackOn: string, uidToStack: string): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             return false;
@@ -208,7 +219,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {AddOptions} [options={}] - Additional options for splitting the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was split successfully, otherwise `false`.
      */
-    async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
+    async function split(uid: string, amountToSplit: number, options: AddOptions = {}): Promise<boolean> {
         const data = document.get();
         if (!data.items) {
             return false;
@@ -231,7 +242,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {Partial<Omit<Item, '_id'>>} data
      * @returns {boolean}
      */
-    async function update(uid: string, data: Partial<Omit<Item, '_id'>>) {
+    async function update(uid: string, data: Partial<Omit<Item, '_id'>>): Promise<boolean> {
         const playerDocument = document.get();
         if (!playerDocument.items) {
             return false;
@@ -258,6 +269,7 @@ export function usePlayerItemManager(player: alt.Player) {
     async function use(uid: string) {
         const item = getByUid(uid);
         if (!item) {
+            console.log(`ItemManager - Cant find Item by UID: ${uid}`);
             return false;
         }
 

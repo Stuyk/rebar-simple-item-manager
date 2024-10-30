@@ -3,7 +3,7 @@ import { useRebar } from '@Server/index.js';
 import { usePlayerItemManager } from './playerItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
 import { useItemManager } from './itemManager.js';
-import { useItemArrayManager } from './itemArrayManager.js';
+import { RebarItems } from '@Shared/types/items.js';
 
 const Rebar = useRebar();
 const Service = Rebar.services.useServiceRegister();
@@ -70,11 +70,11 @@ Service.register('itemService', {
     },
     async itemRemove(id) {
         const itemManager = useItemManager();
-        if (!itemManager.has(id)) {
+        if (!itemManager.has(id.toString())) {
             return;
         }
 
-        await itemManager.remove(id);
+        await itemManager.remove(id.toString());
     },
     async hasSpace(entity, item) {
         if (entity instanceof alt.Player) {

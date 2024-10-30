@@ -16,6 +16,14 @@ declare module '@Shared/types/character.js' {
         items?: Array<Item>;
 
         /**
+         * Items in the player's toolbar
+         *
+         * @type {Array<Item | null>}
+         */
+
+        toolbar?: Array<Item | null>;
+
+        /**
          * The maximum number of inventory slots the player has.
          *
          * @type {number}
